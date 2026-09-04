@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Toaster } from "sonner";
 import { AuthProvider } from "@/contexts/AuthContext";
 import Layout from "@/components/layout/Layout";
+import ProtectedRoute from "@/components/features/ProtectedRoute";
 
 // Pages
 import HomePage from "@/pages/Home";
@@ -15,7 +16,9 @@ import OpportunitiesPage from "@/pages/Opportunities";
 import AIAdvisorPage from "@/pages/AIAdvisor";
 import LoginPage from "@/pages/Login";
 import RegisterPage from "@/pages/Register";
+import ResetPasswordPage from "@/pages/ResetPassword";
 import DashboardPage from "@/pages/Dashboard";
+import AdminDashboard from "@/pages/AdminDashboard";
 import ProfilePage from "@/pages/Profile";
 import SavedItemsPage from "@/pages/SavedItems";
 import CountryDetailPage from "@/pages/CountryDetail";
@@ -40,6 +43,9 @@ import RelocationPlannerPage from "@/pages/RelocationPlanner";
 import CostCalculatorPage from "@/pages/CostCalculator";
 import ApplicationTrackerPage from "@/pages/ApplicationTracker";
 import LocalServicesPage from "@/pages/LocalServices";
+import BlogPage from "@/pages/Blog";
+import BlogDetail from "@/pages/BlogDetail";
+import UnauthorizedPage from "@/pages/Unauthorized";
 import NotFoundPage from "@/pages/NotFound";
 
 export default function App() {
@@ -62,6 +68,28 @@ export default function App() {
           {/* Auth pages (no navbar/footer) */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route path="/unauthorized" element={<UnauthorizedPage />} />
+
+          {/* Admin (no main layout, has its own layout) */}
+          <Route
+            path="/admin/*"
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Dashboard (role-based, no main layout) */}
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <DashboardPage />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Main layout */}
           <Route element={<Layout />}>
@@ -82,10 +110,18 @@ export default function App() {
             <Route path="/opportunities" element={<OpportunitiesPage />} />
             <Route path="/opportunities/:id" element={<OpportunityDetailPage />} />
             <Route path="/ai-advisor" element={<AIAdvisorPage />} />
-            <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/saved" element={<SavedItemsPage />} />
-            <Route path="/applications" element={<ApplicationTrackerPage />} />
+            <Route path="/blog" element={<BlogPage />} />
+            <Route path="/blog/:slug" element={<BlogDetail />} />
+
+            {/* Protected routes */}
+            <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+            <Route path="/saved" element={<ProtectedRoute><SavedItemsPage /></ProtectedRoute>} />
+            <Route path="/applications" element={<ProtectedRoute><ApplicationTrackerPage /></ProtectedRoute>} />
+            <Route path="/notifications" element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />
+            <Route path="/messages" element={<ProtectedRoute><MessagesPage /></ProtectedRoute>} />
+            <Route path="/employer-dashboard" element={<ProtectedRoute><EmployerDashboardPage /></ProtectedRoute>} />
+
+            {/* Public */}
             <Route path="/about" element={<AboutPage />} />
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/faq" element={<FAQPage />} />
@@ -96,9 +132,7 @@ export default function App() {
             <Route path="/cost-calculator" element={<CostCalculatorPage />} />
             <Route path="/local-services" element={<LocalServicesPage />} />
             <Route path="/community" element={<CommunityPage />} />
-            <Route path="/notifications" element={<NotificationsPage />} />
-            <Route path="/messages" element={<MessagesPage />} />
-            <Route path="/employer-dashboard" element={<EmployerDashboardPage />} />
+
             <Route path="*" element={<NotFoundPage />} />
           </Route>
         </Routes>

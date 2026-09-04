@@ -28,6 +28,7 @@ const footerLinks = {
   ],
   company: [
     { label: "About", path: "/about" },
+    { label: "Blog", path: "/blog" },
     { label: "Contact", path: "/contact" },
     { label: "FAQ", path: "/faq" },
     { label: "Privacy Policy", path: "/privacy" },

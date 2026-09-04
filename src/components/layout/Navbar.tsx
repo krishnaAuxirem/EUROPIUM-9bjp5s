@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Bell, User, Menu, X, ChevronDown, Globe, Briefcase, GraduationCap,
   Plane, Home, Building2, TrendingUp, Sparkles, LogOut, Settings, Bookmark, ClipboardList,
-  MapPin, Calculator, Users, MessageSquare
+  MapPin, Calculator, Users, MessageSquare, LayoutDashboard, Shield, Newspaper
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { notifications } from "@/lib/mockData";
@@ -15,11 +15,21 @@ const navItems = [
   { label: "Travel", path: "/travel", icon: Plane },
   { label: "Housing", path: "/housing", icon: Home },
   { label: "Relocation", path: "/relocation-planner", icon: MapPin },
-  { label: "Cost of Living", path: "/cost-calculator", icon: Calculator },
   { label: "AI Advisor", path: "/ai-advisor", icon: Sparkles },
-  { label: "Community", path: "/community", icon: Users },
+  { label: "Blog", path: "/blog", icon: Newspaper },
   { label: "Business", path: "/business", icon: Building2 },
 ];
+
+const ROLE_LABELS: Record<string, string> = {
+  traveler: "✈️ Traveler",
+  student: "🎓 Student",
+  job_seeker: "💼 Job Seeker",
+  relocator: "🏡 Relocator",
+  entrepreneur: "🚀 Entrepreneur",
+  employer: "🏢 Employer",
+  property_provider: "🏘️ Property Provider",
+  admin: "⚙️ Admin",
+};
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -60,6 +70,8 @@ export default function Navbar() {
   };
 
   const isActive = (path: string) => pathname === path || (path !== "/" && pathname.startsWith(path));
+
+  const getDashboardPath = () => user?.role === "admin" ? "/admin" : "/dashboard";
 
   return (
     <>
@@ -167,23 +179,29 @@ export default function Navbar() {
                     <div className="w-8 h-8 rounded-full bg-gold-500 flex items-center justify-center">
                       <span className="text-white font-semibold text-sm">{user?.name.charAt(0)}</span>
                     </div>
-                    <span className={`text-sm font-medium hidden lg:block ${scrolled ? "text-navy-900" : "text-white"}`}>
-                      {user?.name.split(" ")[0]}
-                    </span>
+                    <div className="hidden lg:block text-left">
+                      <p className={`text-xs font-semibold leading-none ${scrolled ? "text-navy-900" : "text-white"}`}>
+                        {user?.name.split(" ")[0]}
+                      </p>
+                      <p className={`text-xs leading-none mt-0.5 ${scrolled ? "text-gray-400" : "text-white/50"}`}>
+                        {ROLE_LABELS[user?.role || ""] || user?.role}
+                      </p>
+                    </div>
                     <ChevronDown size={14} className={scrolled ? "text-gray-400" : "text-white/60"} />
                   </button>
                   {profileOpen && (
-                    <div className="absolute right-0 top-12 w-52 bg-white rounded-2xl shadow-premium-xl border border-border/50 overflow-hidden z-50">
+                    <div className="absolute right-0 top-12 w-56 bg-white rounded-2xl shadow-premium-xl border border-border/50 overflow-hidden z-50">
                       <div className="p-3 border-b border-gray-100">
                         <p className="font-semibold text-navy-900 text-sm">{user?.name}</p>
                         <p className="text-xs text-gray-500">{user?.email}</p>
+                        <span className="tag tag-blue text-xs mt-1">{ROLE_LABELS[user?.role || ""] || user?.role}</span>
                       </div>
                       <div className="p-1.5">
-                        <Link to="/dashboard" onClick={() => setProfileOpen(false)} className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-700 hover:bg-gray-50">
-                          <User size={15} /> Dashboard
+                        <Link to={getDashboardPath()} onClick={() => setProfileOpen(false)} className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-700 hover:bg-gray-50">
+                          <LayoutDashboard size={15} /> Dashboard
                         </Link>
                         <Link to="/profile" onClick={() => setProfileOpen(false)} className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-700 hover:bg-gray-50">
-                          <Settings size={15} /> Profile Settings
+                          <User size={15} /> Profile
                         </Link>
                         <Link to="/saved" onClick={() => setProfileOpen(false)} className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-700 hover:bg-gray-50">
                           <Bookmark size={15} /> Saved Items
@@ -197,12 +215,16 @@ export default function Navbar() {
                         <Link to="/notifications" onClick={() => setProfileOpen(false)} className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-700 hover:bg-gray-50">
                           <Bell size={15} /> Notifications
                         </Link>
-                        <Link to="/employer-dashboard" onClick={() => setProfileOpen(false)} className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-700 hover:bg-gray-50">
-                          <Building2 size={15} /> Employer Dashboard
-                        </Link>
-                        <button onClick={handleLogout} className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-red-600 hover:bg-red-50">
-                          <LogOut size={15} /> Sign Out
-                        </button>
+                        {user?.role === "admin" && (
+                          <Link to="/admin" onClick={() => setProfileOpen(false)} className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-gold-700 hover:bg-gold-50">
+                            <Shield size={15} /> Admin Panel
+                          </Link>
+                        )}
+                        <div className="border-t border-gray-100 mt-1 pt-1">
+                          <button onClick={handleLogout} className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-red-600 hover:bg-red-50">
+                            <LogOut size={15} /> Sign Out
+                          </button>
+                        </div>
                       </div>
                     </div>
                   )}
@@ -215,7 +237,7 @@ export default function Navbar() {
                     Login
                   </Link>
                   <Link to="/register" className="px-4 py-2 bg-gold-500 hover:bg-gold-600 text-white rounded-lg text-sm font-semibold transition-all duration-200 shadow-gold">
-                    Register
+                    Register Free
                   </Link>
                 </div>
               )}
@@ -235,7 +257,7 @@ export default function Navbar() {
 
         {/* Mobile Menu */}
         {mobileOpen && (
-          <div className="xl:hidden border-t border-white/10 bg-navy-900 pb-4">
+          <div className="xl:hidden border-t border-white/10 bg-navy-900 pb-4 max-h-[80vh] overflow-y-auto">
             <nav className="max-w-[1400px] mx-auto px-4 pt-3 space-y-0.5">
               {navItems.map(({ label, path, icon: Icon }) => (
                 <Link
@@ -249,10 +271,24 @@ export default function Navbar() {
                   {label}
                 </Link>
               ))}
-              {!isAuthenticated && (
+              {isAuthenticated ? (
+                <div className="pt-3 border-t border-white/10 mt-2 space-y-1">
+                  <Link to={getDashboardPath()} className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-white/80 hover:bg-white/10">
+                    <LayoutDashboard size={18} /> Dashboard
+                  </Link>
+                  {user?.role === "admin" && (
+                    <Link to="/admin" className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-gold-300 hover:bg-white/10">
+                      <Shield size={18} /> Admin Panel
+                    </Link>
+                  )}
+                  <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-red-400 hover:bg-red-500/10">
+                    <LogOut size={18} /> Sign Out
+                  </button>
+                </div>
+              ) : (
                 <div className="flex gap-3 pt-3 border-t border-white/10 mt-2">
                   <Link to="/login" className="flex-1 text-center px-4 py-2.5 rounded-xl text-white/80 border border-white/20 text-sm font-medium">Login</Link>
-                  <Link to="/register" className="flex-1 text-center px-4 py-2.5 rounded-xl bg-gold-500 text-white text-sm font-semibold">Register</Link>
+                  <Link to="/register" className="flex-1 text-center px-4 py-2.5 rounded-xl bg-gold-500 text-white text-sm font-semibold">Register Free</Link>
                 </div>
               )}
             </nav>

@@ -60,6 +60,7 @@ export interface Job {
   verified?: boolean;
   workMode?: "remote" | "hybrid" | "on-site";
   industry?: string;
+  status?: "active" | "draft" | "closed" | "pending";
 }
 
 export interface University {
@@ -127,6 +128,10 @@ export interface Property {
   colorClass: string;
   rating: number;
   image?: string;
+  status?: "active" | "pending" | "sold" | "rented" | "rejected";
+  views?: number;
+  inquiries?: number;
+  ownerId?: string;
 }
 
 export interface BusinessListing {
@@ -144,6 +149,7 @@ export interface BusinessListing {
   rating: number;
   verified: boolean;
   colorGradient: string;
+  status?: "active" | "pending" | "rejected";
 }
 
 export interface Opportunity {
@@ -190,15 +196,29 @@ export interface TravelDestination {
   tips?: string[];
 }
 
+// User Roles
+export type UserRole =
+  | "traveler"
+  | "student"
+  | "job_seeker"
+  | "relocator"
+  | "entrepreneur"
+  | "employer"
+  | "property_provider"
+  | "admin";
+
 export interface User {
   id: string;
   name: string;
   email: string;
+  password?: string; // hashed/masked representation
   avatar?: string;
+  role: UserRole;
   country?: string;
   city?: string;
   profession?: string;
   bio?: string;
+  phone?: string;
   skills?: string[];
   languages?: string[];
   preferredCountries?: string[];
@@ -218,6 +238,20 @@ export interface User {
   plan: "free" | "premium";
   resumeUrl?: string;
   profileCompleteness?: number;
+  isActive?: boolean;
+  isSuspended?: boolean;
+  lastActive?: string;
+  // Role-specific
+  companyName?: string;
+  companySize?: string;
+  companyWebsite?: string;
+  targetMarket?: string;
+  destinationCountry?: string;
+  studyGoal?: string;
+  travelStyle?: string;
+  verified?: boolean;
+  emailVerified?: boolean;
+  properties?: string[];
 }
 
 export interface WorkExperience {
@@ -473,4 +507,61 @@ export interface CountryBusinessProfile {
   description: string;
   pros: string[];
   cons: string[];
+}
+
+// Blog / Content types
+export interface BlogPost {
+  id: string;
+  title: string;
+  slug: string;
+  content: string;
+  excerpt: string;
+  category: string;
+  tags: string[];
+  author: string;
+  authorId: string;
+  authorAvatar?: string;
+  featuredImage?: string;
+  status: "draft" | "published" | "unpublished";
+  featured: boolean;
+  seoTitle?: string;
+  seoDescription?: string;
+  publishedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+  readTime?: number;
+  views?: number;
+  likes?: number;
+}
+
+// Analytics types
+export interface AnalyticsDataPoint {
+  month: string;
+  value: number;
+  value2?: number;
+}
+
+export interface AdminStats {
+  totalUsers: number;
+  activeUsers: number;
+  newUsers: number;
+  totalJobs: number;
+  totalApplications: number;
+  totalUniversities: number;
+  totalProperties: number;
+  totalBusinesses: number;
+  totalOpportunities: number;
+  revenue: number;
+  pendingVerification: number;
+  reports: number;
+}
+
+// Registered users store
+export interface RegisteredUser {
+  id: string;
+  name: string;
+  email: string;
+  passwordHash: string;
+  role: UserRole;
+  createdAt: string;
 }
